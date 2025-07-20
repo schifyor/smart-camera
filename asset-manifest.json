@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/testpage/static/css/main.b8240d92.css",
-    "main.js": "/testpage/static/js/main.b756038b.js",
-    "static/js/453.a0ff2861.chunk.js": "/testpage/static/js/453.a0ff2861.chunk.js",
-    "index.html": "/testpage/index.html",
-    "main.b8240d92.css.map": "/testpage/static/css/main.b8240d92.css.map",
-    "main.b756038b.js.map": "/testpage/static/js/main.b756038b.js.map",
-    "453.a0ff2861.chunk.js.map": "/testpage/static/js/453.a0ff2861.chunk.js.map"
+    "main.css": "/smart-camera/static/css/main.b8240d92.css",
+    "main.js": "/smart-camera/static/js/main.463394e8.js",
+    "static/js/453.cb8bfaae.chunk.js": "/smart-camera/static/js/453.cb8bfaae.chunk.js",
+    "index.html": "/smart-camera/index.html",
+    "main.b8240d92.css.map": "/smart-camera/static/css/main.b8240d92.css.map",
+    "main.463394e8.js.map": "/smart-camera/static/js/main.463394e8.js.map",
+    "453.cb8bfaae.chunk.js.map": "/smart-camera/static/js/453.cb8bfaae.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.b8240d92.css",
-    "static/js/main.b756038b.js"
+    "static/js/main.463394e8.js"
   ]
 }
