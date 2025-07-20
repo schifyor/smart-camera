@@ -1,12 +1,10 @@
-import './App.css';
+import "./App.css";
+import { ObjectDetector } from "./components/objectDetector";
 
 function App() {
   return (
-    <div className="h-screen bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-center">
-      <div>
-        <h1 className="text-4xl font-bold mb-4">Hallo GitHub Pages 🌐</h1>
-        <p className="text-lg">Dies ist eine React + Tailwind CSS Demo!</p>
-      </div>
+    <div className="w-full h-full bg-[#1c2127] flex flex-col items-center justify-center text-white">
+      <ObjectDetector />
     </div>
   );
 }

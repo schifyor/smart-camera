@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/schifyor/testpage/static/css/main.6beccfb6.css",
+    "main.js": "/schifyor/testpage/static/js/main.b065aad2.js",
+    "static/js/453.db47e145.chunk.js": "/schifyor/testpage/static/js/453.db47e145.chunk.js",
+    "index.html": "/schifyor/testpage/index.html",
+    "main.6beccfb6.css.map": "/schifyor/testpage/static/css/main.6beccfb6.css.map",
+    "main.b065aad2.js.map": "/schifyor/testpage/static/js/main.b065aad2.js.map",
+    "453.db47e145.chunk.js.map": "/schifyor/testpage/static/js/453.db47e145.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6beccfb6.css",
+    "static/js/main.b065aad2.js"
+  ]
+}
