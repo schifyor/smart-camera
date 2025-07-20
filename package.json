@@ -64,5 +64,5 @@
     "@tensorflow/tfjs-converter": "4.22.0",
     "@tensorflow/tfjs-core": "4.22.0"
   },
-  "homepage": "https://github.com/schifyor/testpage"
+  "homepage": "https://schifyor.github.io/testpage"
 }
