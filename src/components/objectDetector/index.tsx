@@ -1,9 +1,7 @@
-import React, { useRef, useState, useEffect, ChangeEvent } from "react";
-
+import React, { useRef, useState, useEffect } from "react";
 import * as tf from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
-// import { Roboflow } from "roboflow/js";
 import { ObjectDetection } from "@tensorflow-models/coco-ssd";
 
 interface Prediction {
@@ -13,135 +11,92 @@ interface Prediction {
 }
 
 export function ObjectDetector() {
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null);
-
-  const [imgData, setImgData] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
-  const [isLoading, setLoading] = useState(false);
+  const [model, setModel] = useState<ObjectDetection | null>(null);
 
-  // HIER WebGL Backend aktivieren
+  // WebGL backend und Modell laden
   useEffect(() => {
-    tf.setBackend("webgl").then(() => tf.ready());
+    async function setup() {
+      await tf.setBackend("webgl");
+      await tf.ready();
+      const loadedModel = await cocoSsd.load();
+      setModel(loadedModel);
+    }
+    setup();
   }, []);
 
-  const isEmptyPredictions = !predictions || predictions.length === 0;
+  // Kamera aktivieren
+  useEffect(() => {
+    async function enableCamera() {
+      if (!videoRef.current) return;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      } catch (err) {
+        console.error("Error accessing webcam:", err);
+      }
+    }
+    enableCamera();
+  }, []);
 
-  const openFilePicker = () => {
-    fileInputRef.current?.click();
-  };
-
-  const normalizePredictions = (
-    predictions: cocoSsd.DetectedObject[],
-    imgSize: { width: number; height: number }
-  ): Prediction[] => {
-    if (!predictions || !imgSize || !imageRef.current) return [];
-
-    const imgWidth = imageRef.current.width;
-    const imgHeight = imageRef.current.height;
-
-    return predictions.map((prediction) => {
-      const [oldX, oldY, oldWidth, oldHeight] = prediction.bbox;
-
-      const x = (oldX * imgWidth) / imgSize.width;
-      const y = (oldY * imgHeight) / imgSize.height;
-      const width = (oldWidth * imgWidth) / imgSize.width;
-      const height = (oldHeight * imgHeight) / imgSize.height;
-
-      return {
-        class: prediction.class,
-        score: prediction.score,
-        bbox: [x, y, width, height],
-      };
-    });
-  };
-
-  const detectObjectsOnImage = async (
-    imageElement: HTMLImageElement,
-    imgSize: { width: number; height: number }
-  ) => {
-    const model: ObjectDetection = await cocoSsd.load();
-    const predictions = await model.detect(imageElement, 6);
-    const normalized = normalizePredictions(predictions, imgSize);
-    setPredictions(normalized);
-    console.log("Predictions: ", predictions);
-  };
-
-  const readImage = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.onload = () => resolve(fileReader.result as string);
-      fileReader.onerror = () => reject(fileReader.error);
-      fileReader.readAsDataURL(file);
-    });
-  };
-
-  const onSelectImage = async (e: ChangeEvent<HTMLInputElement>) => {
-    setPredictions([]);
-    setLoading(true);
-
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const imgData = await readImage(file);
-    setImgData(imgData);
-
-    const imageElement = document.createElement("img");
-    imageElement.src = imgData;
-
-    imageElement.onload = async () => {
-      const imgSize = {
-        width: imageElement.width,
-        height: imageElement.height,
-      };
-      await detectObjectsOnImage(imageElement, imgSize);
-      setLoading(false);
-    };
-  };
+  // Erkennung alle 100ms mit Skalierung basierend auf angezeigter Größe
+  useEffect(() => {
+    if (!model || !videoRef.current || !containerRef.current) return;
+    const interval = setInterval(async () => {
+      const video = videoRef.current!;
+      if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
+      // Displayed dimensions (CSS)
+      const { width: dispW, height: dispH } = video.getBoundingClientRect();
+      // Roh-Videodaten-Dimensionen
+      const { videoWidth: vidW, videoHeight: vidH } = video;
+      if (vidW === 0 || vidH === 0) return;
+      // Erkennung auf dem Video-Element
+      const preds = await model.detect(video);
+      // Normalisiere Bounding Boxes auf angezeigte Größe
+      const scaled = preds.map(p => {
+        const [x, y, w, h] = p.bbox;
+        return {
+          class: p.class,
+          score: p.score,
+          bbox: [
+            (x / vidW) * dispW,
+            (y / vidH) * dispH,
+            (w / vidW) * dispW,
+            (h / vidH) * dispH,
+          ] as [number, number, number, number],
+        };
+      });
+      setPredictions(scaled);
+    }, 100);
+    return () => clearInterval(interval);
+  }, [model]);
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="min-w-[200px] h-[700px] border-4 border-white rounded-md flex items-center justify-center relative">
-        {imgData && (
-          <img
-            src={imgData}
-            ref={imageRef}
-            alt="Target"
-            className="h-full object-contain"
-          />
-        )}
-        {!isEmptyPredictions &&
-          predictions.map((prediction, idx) => (
-            <div
-              key={idx}
-              className="absolute border-4 border-green-500"
-              style={{
-                left: `${prediction.bbox[0]}px`,
-                top: `${prediction.bbox[1]}px`,
-                width: `${prediction.bbox[2]}px`,
-                height: `${prediction.bbox[3]}px`,
-              }}
-            >
-              <div className="absolute -top-6 left-0 text-green-500 font-medium text-base">
-                {`${prediction.class} ${(prediction.score * 100).toFixed(1)}%`}
-              </div>
-            </div>
-          ))}
-      </div>
-
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={onSelectImage}
-        className="hidden"
+    // Container füllt Bildschirm, Video zentriert und passt sich entweder Breite oder Höhe an
+    <div ref={containerRef} className="relative w-full h-screen overflow-hidden bg-black">
+      <video
+        ref={videoRef}
+        className="absolute inset-0 m-auto w-full h-full object-contain"
+        playsInline
+        muted
       />
-
-      <button
-        onClick={openFilePicker}
-        className="mt-8 px-4 py-2 border-2 border-transparent bg-white text-[#0a0f22] text-lg font-medium transition-all duration-200 hover:bg-transparent hover:border-white hover:text-white"
-      >
-        {isLoading ? "Recognizing..." : "Select Image"}
-      </button>
+      {predictions.map((prediction, idx) => {
+        const [x, y, w, h] = prediction.bbox;
+        return (
+          <div
+            key={idx}
+            className="absolute border-2 border-green-500"
+            style={{ left: x, top: y, width: w, height: h }}
+          >
+            <span className="absolute -top-6 left-0 bg-green-500 text-white text-xs px-1">
+              {prediction.class} {(prediction.score * 100).toFixed(1)}%
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
