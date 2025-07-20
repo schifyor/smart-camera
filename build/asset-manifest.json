@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/schifyor/testpage/static/css/main.6beccfb6.css",
-    "main.js": "/schifyor/testpage/static/js/main.b065aad2.js",
-    "static/js/453.db47e145.chunk.js": "/schifyor/testpage/static/js/453.db47e145.chunk.js",
+    "main.css": "/schifyor/testpage/static/css/main.5d0b23b5.css",
+    "main.js": "/schifyor/testpage/static/js/main.18769787.js",
+    "static/js/453.a0ff2861.chunk.js": "/schifyor/testpage/static/js/453.a0ff2861.chunk.js",
     "index.html": "/schifyor/testpage/index.html",
-    "main.6beccfb6.css.map": "/schifyor/testpage/static/css/main.6beccfb6.css.map",
-    "main.b065aad2.js.map": "/schifyor/testpage/static/js/main.b065aad2.js.map",
-    "453.db47e145.chunk.js.map": "/schifyor/testpage/static/js/453.db47e145.chunk.js.map"
+    "main.5d0b23b5.css.map": "/schifyor/testpage/static/css/main.5d0b23b5.css.map",
+    "main.18769787.js.map": "/schifyor/testpage/static/js/main.18769787.js.map",
+    "453.a0ff2861.chunk.js.map": "/schifyor/testpage/static/js/453.a0ff2861.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.6beccfb6.css",
-    "static/js/main.b065aad2.js"
+    "static/css/main.5d0b23b5.css",
+    "static/js/main.18769787.js"
   ]
 }
