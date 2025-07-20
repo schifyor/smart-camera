@@ -85,7 +85,7 @@ export function ObjectDetector() {
         };
       });
       setPredictions(scaled);
-    }, 100);
+    }, 50);
     return () => clearInterval(interval);
   }, [model]);
 
