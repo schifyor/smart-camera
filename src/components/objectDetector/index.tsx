@@ -11,10 +11,29 @@ interface Prediction {
 }
 
 export function ObjectDetector() {
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("environment");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [model, setModel] = useState<ObjectDetection | null>(null);
+
+  // Kamera-Modus-Auswahl
+  const CameraSelector = () => (
+    <div className="absolute top-2 right-2 z-20 flex space-x-2">
+      <button
+        onClick={() => setFacingMode("user")}
+        className={`px-2 py-1 rounded ${facingMode === "user" ? "bg-white text-black" : "bg-gray-700 text-white"}`}
+      >
+        Front
+      </button>
+      <button
+        onClick={() => setFacingMode("environment")}
+        className={`px-2 py-1 rounded ${facingMode === "environment" ? "bg-white text-black" : "bg-gray-700 text-white"}`}
+      >
+        Rück
+      </button>
+    </div>
+  );
 
   // WebGL backend und Modell laden
   useEffect(() => {
@@ -27,12 +46,12 @@ export function ObjectDetector() {
     setup();
   }, []);
 
-  // Kamera aktivieren
+  // Kamera aktivieren (abhängig vom facingMode)
   useEffect(() => {
     async function enableCamera() {
       if (!videoRef.current) return;
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       } catch (err) {
@@ -40,7 +59,7 @@ export function ObjectDetector() {
       }
     }
     enableCamera();
-  }, []);
+  }, [facingMode]);
 
   // Erkennung alle 100ms mit Skalierung basierend auf angezeigter Größe
   useEffect(() => {
@@ -48,14 +67,10 @@ export function ObjectDetector() {
     const interval = setInterval(async () => {
       const video = videoRef.current!;
       if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
-      // Displayed dimensions (CSS)
       const { width: dispW, height: dispH } = video.getBoundingClientRect();
-      // Roh-Videodaten-Dimensionen
       const { videoWidth: vidW, videoHeight: vidH } = video;
       if (vidW === 0 || vidH === 0) return;
-      // Erkennung auf dem Video-Element
       const preds = await model.detect(video);
-      // Normalisiere Bounding Boxes auf angezeigte Größe
       const scaled = preds.map(p => {
         const [x, y, w, h] = p.bbox;
         return {
@@ -75,8 +90,9 @@ export function ObjectDetector() {
   }, [model]);
 
   return (
-    // Container füllt Bildschirm, Video zentriert und passt sich entweder Breite oder Höhe an
     <div ref={containerRef} className="relative w-full h-screen overflow-hidden bg-black">
+      {/* Kamera-Auswahl */}
+      <CameraSelector />
       <video
         ref={videoRef}
         className="absolute inset-0 m-auto w-full h-full object-contain"
