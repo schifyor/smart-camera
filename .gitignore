@@ -1,0 +1,5 @@
+# Umgebungsdateien mit API Keys nicht ins Git pushen
+.env
+
+# node_modules ignorieren
+node_modules/
