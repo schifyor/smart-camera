@@ -12,27 +12,26 @@ interface Prediction {
 
 export function ObjectDetector() {
   const [facingMode, setFacingMode] = useState<"user" | "environment">("environment");
-  const [deviceId, setDeviceId] = useState<string | null>(null);
-  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [model, setModel] = useState<ObjectDetection | null>(null);
 
-  // Kamera-Auswahl Dropdown
+  // Kamera-Modus-Auswahl
   const CameraSelector = () => (
-    <div className="absolute top-2 right-2 z-20 flex space-x-2 bg-black/50 p-2 rounded">
-      <select
-        value={deviceId || ""}
-        onChange={(e) => setDeviceId(e.target.value)}
-        className="px-2 py-1 rounded text-black"
+    <div className="absolute top-2 right-2 z-20 flex space-x-2">
+      <button
+        onClick={() => setFacingMode("user")}
+        className={`px-2 py-1 rounded ${facingMode === "user" ? "bg-white text-black" : "bg-gray-700 text-white"}`}
       >
-        {devices.map((device) => (
-          <option key={device.deviceId} value={device.deviceId}>
-            {device.label || `Kamera ${device.deviceId}`}
-          </option>
-        ))}
-      </select>
+        Front
+      </button>
+      <button
+        onClick={() => setFacingMode("environment")}
+        className={`px-2 py-1 rounded ${facingMode === "environment" ? "bg-white text-black" : "bg-gray-700 text-white"}`}
+      >
+        Rück
+      </button>
     </div>
   );
 
@@ -47,56 +46,42 @@ export function ObjectDetector() {
     setup();
   }, []);
 
-  // Geräte abrufen
+  // Kamera aktivieren (abhängig vom facingMode)
   useEffect(() => {
-  async function fetchDevicesAndEnableCamera() {
+  async function enableCamera() {
+    if (!videoRef.current) return;
+
     try {
-      const allDevices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = allDevices.filter(d => d.kind === "videoinput");
-      setDevices(videoDevices);
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(d => d.kind === "videoinput");
 
-      const back = videoDevices.find(d => d.label.toLowerCase().includes("back"));
-      const defaultDevice = back?.deviceId || videoDevices[0]?.deviceId;
+      let selectedDeviceId: string | undefined;
 
-      if (!defaultDevice) {
-        console.warn("Keine Kamera gefunden");
-        return;
+      if (videoDevices.length > 1) {
+        const backCam = videoDevices.find(d => d.label.toLowerCase().includes("back"));
+        const frontCam = videoDevices.find(d => d.label.toLowerCase().includes("front"));
+
+        if (facingMode === "environment" && backCam) {
+          selectedDeviceId = backCam.deviceId;
+        } else if (facingMode === "user" && frontCam) {
+          selectedDeviceId = frontCam.deviceId;
+        }
       }
 
-      setDeviceId(defaultDevice);
+      const constraints = selectedDeviceId
+        ? { video: { deviceId: { exact: selectedDeviceId } } }
+        : { video: { facingMode } };
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { deviceId: { exact: defaultDevice } },
-      });
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      videoRef.current.srcObject = stream;
+      await videoRef.current.play();
     } catch (err) {
-      console.error("Kamera konnte nicht aktiviert werden:", err);
+      console.error("Error accessing webcam:", err);
     }
   }
 
-  fetchDevicesAndEnableCamera();
-}, []);
-
-  // Kamera aktivieren (abhängig von deviceId)
-  useEffect(() => {
-    async function enableCamera() {
-      if (!videoRef.current || !deviceId) return;
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: { exact: deviceId } },
-        });
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      } catch (err) {
-        console.error("Error accessing webcam:", err);
-      }
-    }
-    enableCamera();
-  }, [deviceId]);
+  enableCamera();
+}, [facingMode]);
 
   // Erkennung alle 100ms mit Skalierung basierend auf angezeigter Größe
   useEffect(() => {
@@ -122,7 +107,7 @@ export function ObjectDetector() {
         };
       });
       setPredictions(scaled);
-    }, 100);
+    }, 50);
     return () => clearInterval(interval);
   }, [model]);
 
