@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/schifyor/testpage/static/css/main.5d0b23b5.css",
-    "main.js": "/schifyor/testpage/static/js/main.3c211e74.js",
-    "static/js/453.a0ff2861.chunk.js": "/schifyor/testpage/static/js/453.a0ff2861.chunk.js",
-    "index.html": "/schifyor/testpage/index.html",
-    "main.5d0b23b5.css.map": "/schifyor/testpage/static/css/main.5d0b23b5.css.map",
-    "main.3c211e74.js.map": "/schifyor/testpage/static/js/main.3c211e74.js.map",
-    "453.a0ff2861.chunk.js.map": "/schifyor/testpage/static/js/453.a0ff2861.chunk.js.map"
+    "main.css": "/testpage/static/css/main.5d0b23b5.css",
+    "main.js": "/testpage/static/js/main.967314c8.js",
+    "static/js/453.a0ff2861.chunk.js": "/testpage/static/js/453.a0ff2861.chunk.js",
+    "index.html": "/testpage/index.html",
+    "main.5d0b23b5.css.map": "/testpage/static/css/main.5d0b23b5.css.map",
+    "main.967314c8.js.map": "/testpage/static/js/main.967314c8.js.map",
+    "453.a0ff2861.chunk.js.map": "/testpage/static/js/453.a0ff2861.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.5d0b23b5.css",
-    "static/js/main.3c211e74.js"
+    "static/js/main.967314c8.js"
   ]
 }

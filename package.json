@@ -9,6 +9,7 @@
     "@tensorflow/tfjs-backend-webgl": "4.22.0",
     "@tensorflow/tfjs-converter": "4.22.0",
     "@tensorflow/tfjs-core": "4.22.0",
+    "@tensorflow/tfjs": "4.22.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -62,7 +63,8 @@
     "@tensorflow/tfjs-backend-cpu": "4.22.0",
     "@tensorflow/tfjs-backend-webgl": "4.22.0",
     "@tensorflow/tfjs-converter": "4.22.0",
-    "@tensorflow/tfjs-core": "4.22.0"
+    "@tensorflow/tfjs-core": "4.22.0",
+    "@tensorflow/tfjs": "4.22.0"
   },
   "homepage": "https://schifyor.github.io/testpage"
 }

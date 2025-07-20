@@ -1,7 +1,7 @@
-import React, { useRef, useState, ChangeEvent } from "react";
+import React, { useRef, useState, useEffect, ChangeEvent } from "react";
 
-import "@tensorflow/tfjs-backend-cpu";
-// import "@tensorflow/tfjs-backend-webgl";
+import * as tf from "@tensorflow/tfjs";
+import "@tensorflow/tfjs-backend-webgl";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 // import { Roboflow } from "roboflow/js";
 import { ObjectDetection } from "@tensorflow-models/coco-ssd";
@@ -19,6 +19,11 @@ export function ObjectDetector() {
   const [imgData, setImgData] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [isLoading, setLoading] = useState(false);
+
+  // HIER WebGL Backend aktivieren
+  useEffect(() => {
+    tf.setBackend("webgl").then(() => tf.ready());
+  }, []);
 
   const isEmptyPredictions = !predictions || predictions.length === 0;
 
