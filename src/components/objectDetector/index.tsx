@@ -12,26 +12,27 @@ interface Prediction {
 
 export function ObjectDetector() {
   const [facingMode, setFacingMode] = useState<"user" | "environment">("environment");
+  const [deviceId, setDeviceId] = useState<string | null>(null);
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [model, setModel] = useState<ObjectDetection | null>(null);
 
-  // Kamera-Modus-Auswahl
+  // Kamera-Auswahl Dropdown
   const CameraSelector = () => (
-    <div className="absolute top-2 right-2 z-20 flex space-x-2">
-      <button
-        onClick={() => setFacingMode("user")}
-        className={`px-2 py-1 rounded ${facingMode === "user" ? "bg-white text-black" : "bg-gray-700 text-white"}`}
+    <div className="absolute top-2 right-2 z-20 flex space-x-2 bg-black/50 p-2 rounded">
+      <select
+        value={deviceId || ""}
+        onChange={(e) => setDeviceId(e.target.value)}
+        className="px-2 py-1 rounded text-black"
       >
-        Front
-      </button>
-      <button
-        onClick={() => setFacingMode("environment")}
-        className={`px-2 py-1 rounded ${facingMode === "environment" ? "bg-white text-black" : "bg-gray-700 text-white"}`}
-      >
-        Rück
-      </button>
+        {devices.map((device) => (
+          <option key={device.deviceId} value={device.deviceId}>
+            {device.label || `Kamera ${device.deviceId}`}
+          </option>
+        ))}
+      </select>
     </div>
   );
 
@@ -46,12 +47,48 @@ export function ObjectDetector() {
     setup();
   }, []);
 
-  // Kamera aktivieren (abhängig vom facingMode)
+  // Geräte abrufen
+  useEffect(() => {
+  async function fetchDevicesAndEnableCamera() {
+    try {
+      const allDevices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = allDevices.filter(d => d.kind === "videoinput");
+      setDevices(videoDevices);
+
+      const back = videoDevices.find(d => d.label.toLowerCase().includes("back"));
+      const defaultDevice = back?.deviceId || videoDevices[0]?.deviceId;
+
+      if (!defaultDevice) {
+        console.warn("Keine Kamera gefunden");
+        return;
+      }
+
+      setDeviceId(defaultDevice);
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: defaultDevice } },
+      });
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+    } catch (err) {
+      console.error("Kamera konnte nicht aktiviert werden:", err);
+    }
+  }
+
+  fetchDevicesAndEnableCamera();
+}, []);
+
+  // Kamera aktivieren (abhängig von deviceId)
   useEffect(() => {
     async function enableCamera() {
-      if (!videoRef.current) return;
+      if (!videoRef.current || !deviceId) return;
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { deviceId: { exact: deviceId } },
+        });
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       } catch (err) {
@@ -59,7 +96,7 @@ export function ObjectDetector() {
       }
     }
     enableCamera();
-  }, [facingMode]);
+  }, [deviceId]);
 
   // Erkennung alle 100ms mit Skalierung basierend auf angezeigter Größe
   useEffect(() => {
@@ -85,7 +122,7 @@ export function ObjectDetector() {
         };
       });
       setPredictions(scaled);
-    }, 50);
+    }, 100);
     return () => clearInterval(interval);
   }, [model]);
 
