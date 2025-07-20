@@ -3,6 +3,7 @@ import React, { useRef, useState, ChangeEvent } from "react";
 import "@tensorflow/tfjs-backend-cpu";
 // import "@tensorflow/tfjs-backend-webgl";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
+// import { Roboflow } from "roboflow/js";
 import { ObjectDetection } from "@tensorflow-models/coco-ssd";
 
 interface Prediction {
@@ -117,7 +118,7 @@ export function ObjectDetector() {
               }}
             >
               <div className="absolute -top-6 left-0 text-green-500 font-medium text-base">
-                {`${prediction.class} ${prediction.score.toFixed(1)}%`}
+                {`${prediction.class} ${(prediction.score * 100).toFixed(1)}%`}
               </div>
             </div>
           ))}
