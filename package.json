@@ -1,15 +1,15 @@
 {
-  "name": "my-page",
+  "name": "smart-camera",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@headlessui/react": "^2.2.4",
     "@tensorflow-models/coco-ssd": "2.2.3",
+    "@tensorflow/tfjs": "4.22.0",
     "@tensorflow/tfjs-backend-cpu": "4.22.0",
     "@tensorflow/tfjs-backend-webgl": "4.22.0",
     "@tensorflow/tfjs-converter": "4.22.0",
     "@tensorflow/tfjs-core": "4.22.0",
-    "@tensorflow/tfjs": "4.22.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -18,10 +18,10 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "axios": "^1.10.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-scripts": "^5.0.1",
-    "roboflow": "^0.2.0",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
@@ -60,11 +60,11 @@
     "tailwindcss-cli": "^0.1.2"
   },
   "peerDependencies": {
+    "@tensorflow/tfjs": "4.22.0",
     "@tensorflow/tfjs-backend-cpu": "4.22.0",
     "@tensorflow/tfjs-backend-webgl": "4.22.0",
     "@tensorflow/tfjs-converter": "4.22.0",
-    "@tensorflow/tfjs-core": "4.22.0",
-    "@tensorflow/tfjs": "4.22.0"
+    "@tensorflow/tfjs-core": "4.22.0"
   },
-  "homepage": "https://schifyor.github.io/testpage"
+  "homepage": "https://schifyor.github.io/smart-camera"
 }
